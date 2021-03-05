@@ -20,21 +20,16 @@ var url = "https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/2.5_month.g
 // console.log(url);
 
 
-// Function for the circles returning colors based on depth
-function colorDisplay(depth) {
-  if (depth > -10 && depth < 10) {
-      return "#E0FFFF"
-  }else if (depth >= 10 && depth < 30) {
-      return "#FFB6C1"
-  }else if (depth >= 30 && depth < 50) {
-      return "#6495ED"
-  }else if (depth >= 50 && depth < 70) {
-      return "#00008B"
-  }else if (depth >= 70 && depth < 90) {
-      return "#A52A2A"
-  }else {
-      return "#8A2BE2"}
+function colorDisplay(depth){
+  if (depth > 90) return "purple";
+  else if (depth > 70) return "Red";
+  else if (depth > 50) return "Orange";
+  else if (depth > 30) return "blue";
+  else if (depth > 10) return  "Yellow";
+  else if (depth < 10) return "pink";
+  else return "green";
 };
+
 
 // Grab data with d3 and read it
 d3.json(url, function(data) {
@@ -70,6 +65,27 @@ d3.json(url, function(data) {
       // 
   // Add entire geoJSON layer to map
   }).addTo(myMap);
-
+  
 
 });
+
+
+var legend = L.control({position: 'bottomright'});
+
+legend.onAdd = function () {
+
+    var div = L.DomUtil.create('div', 'info legend'),
+        depth = ["-10", "10", "30", "50", "70", "90"],
+        color = ["pink", "green", "yellow", "blue", "orange", "red"];
+
+    // loop through our density intervals and generate a label with a colored square for each interval
+    for (var i = 0; i < depth.length; i++) {
+        div.innerHTML +=
+            '<i style="background:' + colorDisplay(depth[i]) + '"></i> ' +
+            depth[i] + (depth[i + 1] ? '&ndash;' + depth[i + 1] + '<br>' : '+');
+    }
+
+    return div;
+};
+
+legend.addTo(myMap);
